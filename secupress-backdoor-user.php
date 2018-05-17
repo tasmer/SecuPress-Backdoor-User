@@ -66,6 +66,7 @@ Just rename, upload, run it and read.
 ---------------------------------------------------------------------------*/
 
 define( 'VERSION', '3.1.2' );
+define( 'WP_BEDROCK', true );
 // Optional deleting file after use
 $delete_file = true;
 
@@ -74,17 +75,24 @@ if ( 'secupress-backdoor-user.php' === strtolower( basename( __FILE__ ) ) ) {
 	die("Please rename the file before use!");
 }
 
-// Load WordPress
-while ( ! is_file( 'wp-load.php' ) ) {
-	if ( is_dir( '..' ) && getcwd() != '/' ) {
-		chdir( '..' );
-	} else {
-		die( 'Could not find WordPress!' );
-	}
-}
+if ( WP_BEDROCK ) {
+	require_once(dirname(__DIR__) . '/vendor/autoload.php');
+	require_once(dirname(__DIR__) . '/config/application.php');
 
-require_once( 'wp-load.php' );
-require_once( './wp-admin/includes/user.php' );
+	require_once( ABSPATH . 'wp-load.php' );
+	require_once( ABSPATH . '/wp-admin/includes/user.php' );
+} else {
+	while ( ! is_file( 'wp-load.php' ) ) {
+		if ( is_dir( '..' ) && getcwd() != '/' ) {
+			chdir( '..' );
+		} else {
+			die( 'Could not find WordPress!' );
+		}
+	}
+
+	require_once( 'wp-load.php' );
+	require_once( './wp-admin/includes/user.php' );
+}
 
 // Get all roles
 $roles = new WP_Roles();
